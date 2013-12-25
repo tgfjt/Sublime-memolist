@@ -1,0 +1,17 @@
+[
+    {
+        "caption": "Memolist: Open",
+        "command": "memolist_open",
+        "args": {}
+    },
+    {
+        "caption": "Memolist: Show List",
+        "command": "memolist_show",
+        "args": {}
+    },
+    {
+        "caption": "Memolist: Search",
+        "command": "memolist_search",
+        "args": {}
+    }
+]
