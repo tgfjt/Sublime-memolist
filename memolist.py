@@ -122,7 +122,7 @@ class MemolistSearchCommand(sublime_plugin.WindowCommand):
                 return None
         else:
             try:
-                output = subprocess.Popen(cmd, stdout=subprocess.PIPE, startupinfo=startupinfo).communicate()[0]
+                output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
             except subprocess.CalledProcessError:
                 print('Memolist - search: No such file or directory')
                 return None
