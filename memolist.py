@@ -50,13 +50,18 @@ class MemolistOpenCommand(sublime_plugin.WindowCommand):
             return None
 
         dir_path = self.set_memolist_dir()
-        insert_text[0] += file_title
+        insert_text[0] = file_title
         date_prefix = default_settings['memolist_memo_date'] + '-'
+        file_postfix = '.' + default_settings['memolist_memo_suffix']
         file_name = datetime.datetime.today().strftime(date_prefix) + file_title
 
-        self.window.open_file(dir_path + '/' + file_name + '.md')
+        self.window.open_file(dir_path + '/' + file_name + file_postfix)
+
+        if os.path.exists(dir_path + '/' + file_name + file_postfix):
+            return None
+
         sublime.set_timeout(lambda:
-                self.window.run_command('memolist_insert'), 0)
+                self.window.run_command('memolist_insert'), 10)
 
     def set_memolist_dir(self):
         global default_settings
@@ -72,7 +77,7 @@ class MemolistOpenCommand(sublime_plugin.WindowCommand):
 
     def get_filename(self):
         global insert_text
-        insert_text[2] += datetime.datetime.today().strftime('%Y-%m-%d %H:%M')
+        insert_text[2] = datetime.datetime.today().strftime('%Y-%m-%d %H:%M')
         return ''
 
 class MemolistShowCommand(sublime_plugin.WindowCommand):

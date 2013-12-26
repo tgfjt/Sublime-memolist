@@ -1,0 +1,14 @@
+[
+    {
+        "keys": ["super+m", "super+n"],
+        "command": "memolist_open"
+    },
+    {
+        "keys": ["super+m", "super+l"],
+        "command": "memolist_show"
+    },
+    {
+        "keys": ["super+m", "super+g"],
+        "command": "memolist_search"
+    }
+]
