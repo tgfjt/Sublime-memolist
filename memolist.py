@@ -1,8 +1,16 @@
-# -*- coding:utf-8 -*-
+# coding:utf-8
+
+u'''Sublime-memolist
+ simple plugin for memo
+ import os, datetime, subprocess
+'''
 
 import sublime
 import sublime_plugin
-import os, datetime, subprocess
+import os
+import datetime
+import subprocess
+
 
 default_settings = {
     'memolist_template_dir_path': '$HOME/memo',
@@ -18,6 +26,7 @@ insert_text = [
     ''
 ]
 
+
 def update_settings():
     global default_settings
     settings = sublime.load_settings('Sublime-memolist.sublime-settings')
@@ -28,16 +37,20 @@ def update_settings():
     }
     default_settings.update(user_settings)
 
+
 class MemolistInsertCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         global insert_text
-        self.view.insert(edit, 0, '\n'.join(insert_text))
+        self.text = insert_text
+        self.view.insert(edit, 0, '\n'.join(self.text))
+
 
 class MemolistOpenCommand(sublime_plugin.WindowCommand):
     def run(self):
         update_settings()
+        self.title = 'Memo title:'
         self.window.show_input_panel(
-            'Memo title:',
+            self.title,
             self.get_filename(),
             self.open_memo_file,
             None, None)
@@ -59,14 +72,15 @@ class MemolistOpenCommand(sublime_plugin.WindowCommand):
         if os.path.exists(dir_path + '/' + file_name + file_postfix):
             return None
 
-        sublime.set_timeout(lambda:
-                self.window.run_command('memolist_insert'), 10)
+        sublime.set_timeout(lambda: self.window.run_command('memolist_insert'), 10)
 
     def set_memolist_dir(self):
         global default_settings
-        memo_dir = os.path.expandvars(default_settings['memolist_template_dir_path'])
+        template_path = default_settings['memolist_template_dir_path']
+        memo_dir = os.path.expandvars(template_path)
 
-        self.makedir(memo_dir)
+        if not os.path.isdir(memo_dir):
+            os.mkdir(memo_dir)
 
         return memo_dir + '/'
 
@@ -79,32 +93,41 @@ class MemolistOpenCommand(sublime_plugin.WindowCommand):
         insert_text[2] = datetime.datetime.today().strftime('%Y-%m-%d %H:%M')
         return ''
 
+
 class MemolistShowCommand(sublime_plugin.WindowCommand):
     def run(self):
         global default_settings
         update_settings()
-        self.memo_dir = os.path.expandvars(default_settings['memolist_template_dir_path'])
+        template_path = default_settings['memolist_template_dir_path']
+        self.files = ''
+        self.error_message = 'Memolist - open: No such file or directory'
+        self.memo_dir = os.path.expandvars(template_path)
 
         try:
             self.files = os.listdir(self.memo_dir)
         except os.error:
-            print('Memolist - open: No such file or directory')
+            print(self.error_message)
             return None
 
         if '.DS_Store' in self.files:
             self.files.remove('.DS_Store')
- 
+
         self.window.show_quick_panel(self.files, self.on_chosen)
 
     def on_chosen(self, index):
         if index == -1:
-          return
+            return
 
         self.window.open_file(self.memo_dir + '/' + self.files[index])
+
 
 class MemolistSearchCommand(sublime_plugin.WindowCommand):
     def run(self):
         update_settings()
+        template_path = default_settings['memolist_template_dir_path']
+        self.results = []
+        self.error_message = 'Memolist - search: No such file or directory'
+        self.memo_dir = os.path.expandvars(template_path)
         self.window.show_input_panel(
             'MemoGrep word:',
             '',
@@ -113,8 +136,6 @@ class MemolistSearchCommand(sublime_plugin.WindowCommand):
 
     def search_memo_file(self, query):
         global default_settings
-        self.results = []
-        self.memo_dir = os.path.expandvars(default_settings['memolist_template_dir_path'])
 
         cmd = ['grep', '-nrl', query, self.memo_dir]
 
@@ -122,19 +143,19 @@ class MemolistSearchCommand(sublime_plugin.WindowCommand):
             try:
                 output = subprocess.check_output(cmd, stderr=subprocess.PIPE)
             except subprocess.CalledProcessError:
-                print('Memolist - search: No such file or directory')
+                print(self.error_message)
                 return None
         else:
             try:
                 output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
             except subprocess.CalledProcessError:
-                print('Memolist - search: No such file or directory')
+                print(self.error_message)
                 return None
 
         for line in output.decode().splitlines():
             try:
                 self.results.append(line.replace(self.memo_dir + '/', ''))
-            except:
+            except None:
                 pass
 
         if '.DS_Store' in self.results:
@@ -144,13 +165,6 @@ class MemolistSearchCommand(sublime_plugin.WindowCommand):
 
     def on_chosen(self, index):
         if index == -1:
-          return
+            return
 
         self.window.open_file(self.memo_dir + '/' + self.results[index])
-
-class MemolistListener(sublime_plugin.EventListener):
-    def on_post_save(self, view):
-        update_settings();
-
-    def on_load(self, view):
-        update_settings();
