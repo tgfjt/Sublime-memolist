@@ -13,10 +13,9 @@ default_settings = {
 insert_text = [
     'title: ',
     '==========',
-    'date: ',
-    'tags: []',
-    'categories: []',
-    '- - -'
+    '* date: ',
+    '- - -',
+    ''
 ]
 
 def update_settings():
