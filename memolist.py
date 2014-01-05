@@ -1,15 +1,10 @@
 # coding:utf-8
 
-u'''Sublime-memolist
- simple plugin for memo
- import os, datetime, subprocess
-'''
-
 import sublime
 import sublime_plugin
 import os
-import datetime
 import subprocess
+import datetime
 
 
 default_settings = {
