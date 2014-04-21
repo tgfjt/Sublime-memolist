@@ -19,6 +19,5 @@ Memo List | `Command + M, Command + L`
 Memo Grep | `Command + M, Command + G`
 
 
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/tgfjt/sublime-memolist/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
+## License
+MIT
